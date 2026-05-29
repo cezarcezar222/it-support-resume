@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Support Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2330;
+    --border: #30363d;
+    --green: #3fb950;
+    --green-dim: #1a4a22;
+    --yellow: #d29922;
+    --red: #f85149;
+    --blue: #58a6ff;
+    --text: #e6edf3;
+    --text-muted: #7d8590;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: var(--mono);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .logo-icon {
+    width: 24px; height: 24px;
+    background: var(--green);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bg);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .header-badge {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    background: var(--green-dim);
+    color: var(--green);
+    border: 1px solid var(--green);
+    border-radius: 20px;
+    padding: 2px 10px;
+  }
+
+  /* NAV TABS */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0;
+    padding: 0 2rem;
+    overflow-x: auto;
+  }
+
+  .tab {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    white-space: nowrap;
+    transition: all 0.15s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--green); border-bottom-color: var(--green); }
+
+  /* MAIN */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* SECTION HEADING */
+  .section-head {
+    margin-bottom: 1.5rem;
+  }
+
+  .section-head h2 {
+    font-family: var(--mono);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+  }
+
+  .section-head p {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  /* CARDS GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+
+  @media (max-width: 700px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+
+  .card-title {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+  }
+
+  /* TERMINAL */
+  .terminal {
+    background: #010409;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .terminal-bar {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-red { background: #f85149; }
+  .dot-yellow { background: #d29922; }
+  .dot-green { background: #3fb950; }
+
+  .terminal-title {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-left: 0.5rem;
+  }
+
+  .terminal-body {
+    padding: 1rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.7;
+    min-height: 220px;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .line-green { color: var(--green); }
+  .line-blue { color: var(--blue); }
+  .line-red { color: var(--red); }
+  .line-yellow { color: var(--yellow); }
+  .line-muted { color: var(--text-muted); }
+
+  /* INPUT ROW */
+  .input-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.55rem 0.75rem;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input[type="text"]:focus { border-color: var(--green); }
+
+  textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 0.84rem;
+    outline: none;
+    resize: vertical;
+    transition: border-color 0.15s;
+  }
+
+  textarea:focus { border-color: var(--green); }
+
+  select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.55rem 0.75rem;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 0.84rem;
+    outline: none;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .btn {
+    background: var(--green-dim);
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.55rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn:hover { background: var(--green); color: var(--bg); }
+
+  .btn-danger {
+    background: transparent;
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  .btn-danger:hover { background: var(--red); color: #fff; }
+
+  /* STATUS BADGE */
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .badge-open { background: #1a3050; color: var(--blue); border: 1px solid var(--blue); }
+  .badge-progress { background: #3a2a0a; color: var(--yellow); border: 1px solid var(--yellow); }
+  .badge-closed { background: var(--green-dim); color: var(--green); border: 1px solid var(--green); }
+  .badge-high { background: #3a0a0a; color: var(--red); border: 1px solid var(--red); }
+  .badge-low { background: #1a1a2a; color: var(--text-muted); border: 1px solid var(--border); }
+
+  /* TICKET TABLE */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 0.65rem 0.75rem;
+    border-bottom: 1px solid #1c2330;
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+
+  /* GUIDE ACCORDION */
+  .guide-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+  }
+
+  .guide-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+    background: var(--surface);
+    font-size: 0.88rem;
+    font-weight: 500;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .guide-header:hover { background: var(--surface2); }
+
+  .guide-header span { display: flex; align-items: center; gap: 0.6rem; }
+
+  .guide-icon {
+    font-size: 1rem;
+    width: 28px; height: 28px;
+    background: var(--surface2);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .chevron {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    transition: transform 0.2s;
+  }
+
+  .guide-item.open .chevron { transform: rotate(90deg); }
+
+  .guide-body {
+    display: none;
+    padding: 1rem;
+    background: #010409;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    line-height: 1.8;
+    border-top: 1px solid var(--border);
+  }
+
+  .guide-item.open .guide-body { display: block; }
+
+  .step {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .step-num {
+    color: var(--green);
+    font-weight: 600;
+    min-width: 20px;
+  }
+
+  .step-text { color: var(--text); }
+  .step-cmd { color: var(--blue); }
+  .step-note { color: var(--text-muted); font-style: italic; }
+
+  /* FORM */
+  .form-group { margin-bottom: 1rem; }
+  .form-label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+  }
+
+  /* STAT CARDS */
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 0.35rem;
+  }
+
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: var(--mono);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .empty-state .emoji { font-size: 2rem; margin-bottom: 0.5rem; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">IT</div>
+    IT Support Toolkit
+  </div>
+  <div class="header-badge">v1.0.0 — STABLE</div>
+</header>
+
+<nav>
+  <button class="tab active" onclick="switchTab('diag')">🔍 Diagnostics</button>
+  <button class="tab" onclick="switchTab('tickets')">🎫 Ticket Log</button>
+  <button class="tab" onclick="switchTab('guides')">📋 Troubleshoot Guides</button>
+  <button class="tab" onclick="switchTab('ref')">📡 Quick Reference</button>
+</nav>
+
+<main>
+
+  <!-- ========== DIAGNOSTICS ========== -->
+  <div class="panel active" id="panel-diag">
+    <div class="section-head">
+      <h2>// Network & System Diagnostics</h2>
+      <p>Simulate common diagnostic commands used in help desk environments.</p>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:1rem">
+      <div class="card">
+        <div class="card-title">Run Diagnostic</div>
+        <div class="form-group">
+          <label class="form-label">Command</label>
+          <select id="diagCmd">
+            <option value="ping">ping — test host reachability</option>
+            <option value="ipconfig">ipconfig /all — view IP configuration</option>
+            <option value="tracert">tracert — trace packet route</option>
+            <option value="nslookup">nslookup — DNS lookup</option>
+            <option value="netstat">netstat -an — view active connections</option>
+            <option value="sfc">sfc /scannow — system file check</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Target Host (if applicable)</label>
+          <input type="text" id="diagHost" placeholder="e.g. google.com or 192.168.1.1" value="google.com">
+        </div>
+        <button class="btn" onclick="runDiag()">▶ Run Command</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">System Status</div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;" id="sysStatus">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.83rem;padding:0.4rem 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text-muted);font-family:var(--mono)">DNS Resolution</span>
+            <span class="badge badge-closed">OK</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.83rem;padding:0.4rem 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text-muted);font-family:var(--mono)">Default Gateway</span>
+            <span class="badge badge-closed">OK</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.83rem;padding:0.4rem 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text-muted);font-family:var(--mono)">DHCP Lease</span>
+            <span class="badge badge-closed">OK</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.83rem;padding:0.4rem 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text-muted);font-family:var(--mono)">Internet Connectivity</span>
+            <span class="badge badge-closed">OK</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.83rem;padding:0.4rem 0">
+            <span style="color:var(--text-muted);font-family:var(--mono)">Windows Firewall</span>
+            <span class="badge badge-progress">CHECK</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+        <span class="terminal-title">Command Prompt — diagnostics</span>
+      </div>
+      <div class="terminal-body" id="termOutput">
+        <div class="line-muted">Microsoft Windows [Version 10.0.22621.3296]</div>
+        <div class="line-muted">(c) Microsoft Corporation. All rights reserved.</div>
+        <div>&nbsp;</div>
+        <div><span class="line-green">C:\Users\HelpDesk&gt;</span> <span class="line-muted">Select a command above and click Run.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== TICKETS ========== -->
+  <div class="panel" id="panel-tickets">
+    <div class="section-head">
+      <h2>// Ticket Log</h2>
+      <p>Create and track support tickets. Demonstrates ITSM workflow understanding.</p>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:1.5rem">
+      <div class="stat-card">
+        <div class="stat-num line-blue" id="statOpen">0</div>
+        <div class="stat-label">Open</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num line-yellow" id="statProgress">0</div>
+        <div class="stat-label">In Progress</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num line-green" id="statClosed">0</div>
+        <div class="stat-label">Resolved</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:1.5rem">
+      <div class="card">
+        <div class="card-title">New Ticket</div>
+        <div class="form-group">
+          <label class="form-label">Issue Title</label>
+          <input type="text" id="tTitle" placeholder="e.g. Cannot connect to VPN">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select id="tCat">
+            <option>Network / Connectivity</option>
+            <option>Hardware</option>
+            <option>Software / Application</option>
+            <option>Account / Password</option>
+            <option>Printer</option>
+            <option>Email</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select id="tPriority">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="tDesc" rows="3" placeholder="Describe the issue..."></textarea>
+        </div>
+        <button class="btn" onclick="addTicket()">+ Submit Ticket</button>
+      </div>
+
+      <div class="card" style="overflow-x:auto">
+        <div class="card-title">Active Tickets</div>
+        <div id="ticketTableWrap">
+          <div class="empty-state"><div class="emoji">📭</div>No tickets yet. Submit one!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== GUIDES ========== -->
+  <div class="panel" id="panel-guides">
+    <div class="section-head">
+      <h2>// Troubleshooting Guides</h2>
+      <p>Step-by-step resolution procedures for the most common help desk issues.</p>
+    </div>
+
+    <div id="guidesContainer"></div>
+  </div>
+
+  <!-- ========== REFERENCE ========== -->
+  <div class="panel" id="panel-ref">
+    <div class="section-head">
+      <h2>// Quick Reference</h2>
+      <p>Common ports, protocols, and commands every IT support tech should know.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Common Ports & Protocols</div>
+        <table>
+          <thead>
+            <tr><th>Port</th><th>Protocol</th><th>Use</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="line-blue" style="font-family:var(--mono)">21</td><td>FTP</td><td style="color:var(--text-muted)">File Transfer</td></tr>
+            <tr><td class="line-blue" style="font-family:var(--mono)">22</td><td>SSH</td><td style="color:var(--text-muted)">Secure Remote Shell</td></tr>
+            <tr><td class="line-blue" style="font-family:var(--mono)">25</td><td>SMTP</td><td style="color:var(--text-muted)">Outbound Email</td></tr>
+            <tr><td class="line-blue" style="font-family:var(--mono)">53</td><td>DNS</td><td style="color:var(--text-muted)">Name Resolution</td></tr>
+            <tr><td class="line-blue" style="font-family:var(--mono)">80</td><td>HTTP</td><td style="color:var(--text-muted)">Web (unencrypted)</td></tr>
+            <tr><td class="line-blue" style="font-family:var(--mono)">443</td><td>HTTPS</td><td style="color:var(--text-muted)">Web (encrypted)</td></tr>
+            <tr><td class="line-blue" style="font-family:var(--mono)">110</td><td>POP3</td><td style="color:var(--text-muted)">Inbound Email</td></tr>
+            <tr><td class="line-blue" style="font-family:var(--mono)">143</td><td>IMAP</td><td style="color:var(--text-muted)">Email Sync</td></tr>
+            <tr><td class="line-blue" style="font-family:var(--mono)">3389</td><td>RDP</td><td style="color:var(--text-muted)">Remote Desktop</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Essential CMD Commands</div>
+        <table>
+          <thead>
+            <tr><th>Command</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="line-green" style="font-family:var(--mono)">ipconfig /all</td><td style="color:var(--text-muted)">Full IP info</td></tr>
+            <tr><td class="line-green" style="font-family:var(--mono)">ipconfig /release</td><td style="color:var(--text-muted)">Drop DHCP lease</td></tr>
+            <tr><td class="line-green" style="font-family:var(--mono)">ipconfig /renew</td><td style="color:var(--text-muted)">Get new IP from DHCP</td></tr>
+            <tr><td class="line-green" style="font-family:var(--mono)">ipconfig /flushdns</td><td style="color:var(--text-muted)">Clear DNS cache</td></tr>
+            <tr><td class="line-green" style="font-family:var(--mono)">ping -t [host]</td><td style="color:var(--text-muted)">Continuous ping</td></tr>
+            <tr><td class="line-green" style="font-family:var(--mono)">tracert [host]</td><td style="color:var(--text-muted)">Trace route</td></tr>
+            <tr><td class="line-green" style="font-family:var(--mono)">netstat -an</td><td style="color:var(--text-muted)">Active connections</td></tr>
+            <tr><td class="line-green" style="font-family:var(--mono)">sfc /scannow</td><td style="color:var(--text-muted)">Scan system files</td></tr>
+            <tr><td class="line-green" style="font-family:var(--mono)">gpupdate /force</td><td style="color:var(--text-muted)">Force Group Policy</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">OSI Model Cheat Sheet</div>
+        <table>
+          <thead>
+            <tr><th>Layer</th><th>Name</th><th>Examples</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="line-green" style="font-family:var(--mono)">7</td><td>Application</td><td style="color:var(--text-muted)">HTTP, DNS, FTP</td></tr>
+            <tr><td class="line-green" style="font-family:var(--mono)">6</td><td>Presentation</td><td style="color:var(--text-muted)">SSL/TLS, JPEG</td></tr>
+            <tr><td class="line-green" style="font-family:var(--mono)">5</td><td>Session</td><td style="color:var(--text-muted)">NetBIOS, RPC</td></tr>
+            <tr><td class="line-green" style="font-family:var(--mono)">4</td><td>Transport</td><td style="color:var(--text-muted)">TCP, UDP</td></tr>
+            <tr><td class="line-green" style="font-family:var(--mono)">3</td><td>Network</td><td style="color:var(--text-muted)">IP, ICMP, Routers</td></tr>
+            <tr><td class="line-green" style="font-family:var(--mono)">2</td><td>Data Link</td><td style="color:var(--text-muted)">MAC, Switches</td></tr>
+            <tr><td class="line-green" style="font-family:var(--mono)">1</td><td>Physical</td><td style="color:var(--text-muted)">Cables, NICs, Hubs</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Private IP Ranges (RFC 1918)</div>
+        <table>
+          <thead>
+            <tr><th>Range</th><th>Class</th><th>Hosts</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="line-blue" style="font-family:var(--mono)">10.0.0.0/8</td><td>A</td><td style="color:var(--text-muted)">16,777,214</td></tr>
+            <tr><td class="line-blue" style="font-family:var(--mono)">172.16.0.0/12</td><td>B</td><td style="color:var(--text-muted)">1,048,576</td></tr>
+            <tr><td class="line-blue" style="font-family:var(--mono)">192.168.0.0/16</td><td>C</td><td style="color:var(--text-muted)">65,534</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:1rem;font-size:0.78rem;color:var(--text-muted);line-height:1.6;font-family:var(--mono)">
+          Loopback: <span class="line-blue">127.0.0.1</span> — always refers to local machine.<br>
+          APIPA: <span class="line-yellow">169.254.x.x</span> — no DHCP server found.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ===== TAB SWITCHING =====
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-' + id).classList.add('active');
+}
+
+// ===== DIAGNOSTICS =====
+const diagOutputs = {
+  ping: (host) => [
+    { t: 'normal', v: `Pinging ${host} with 32 bytes of data:` },
+    { t: 'green', v: `Reply from 142.250.80.46: bytes=32 time=14ms TTL=118` },
+    { t: 'green', v: `Reply from 142.250.80.46: bytes=32 time=12ms TTL=118` },
+    { t: 'green', v: `Reply from 142.250.80.46: bytes=32 time=13ms TTL=118` },
+    { t: 'green', v: `Reply from 142.250.80.46: bytes=32 time=11ms TTL=118` },
+    { t: 'muted', v: `` },
+    { t: 'muted', v: `Ping statistics for 142.250.80.46:` },
+    { t: 'normal', v: `    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)` },
+    { t: 'green', v: `Approximate round trip times in milli-seconds:` },
+    { t: 'green', v: `    Minimum = 11ms, Maximum = 14ms, Average = 12ms` },
+  ],
+  ipconfig: () => [
+    { t: 'normal', v: `Windows IP Configuration` },
+    { t: 'muted', v: `` },
+    { t: 'blue', v: `Ethernet adapter Local Area Connection:` },
+    { t: 'muted', v: `   Connection-specific DNS Suffix  . : corp.local` },
+    { t: 'normal', v: `   IPv4 Address. . . . . . . . . . . : 192.168.1.105` },
+    { t: 'normal', v: `   Subnet Mask . . . . . . . . . . . : 255.255.255.0` },
+    { t: 'normal', v: `   Default Gateway . . . . . . . . . : 192.168.1.1` },
+    { t: 'muted', v: `` },
+    { t: 'blue', v: `   DHCP Server . . . . . . . . . . . : 192.168.1.1` },
+    { t: 'blue', v: `   DNS Servers . . . . . . . . . . . : 8.8.8.8` },
+    { t: 'blue', v: `                                       8.8.4.4` },
+    { t: 'green', v: `   Lease Obtained. . . . . . . . . . : Today 08:32 AM` },
+    { t: 'green', v: `   Lease Expires . . . . . . . . . . : Tomorrow 08:32 AM` },
+  ],
+  tracert: (host) => [
+    { t: 'normal', v: `Tracing route to ${host} over a maximum of 30 hops:` },
+    { t: 'muted', v: `` },
+    { t: 'green', v: `  1     1 ms     1 ms     1 ms  192.168.1.1` },
+    { t: 'green', v: `  2     8 ms     7 ms     8 ms  10.0.0.1` },
+    { t: 'green', v: `  3    10 ms    11 ms     9 ms  72.14.215.1` },
+    { t: 'yellow',v: `  4    12 ms    13 ms    14 ms  108.170.246.34` },
+    { t: 'green', v: `  5    14 ms    13 ms    13 ms  142.250.80.46` },
+    { t: 'muted', v: `` },
+    { t: 'green', v: `Trace complete.` },
+  ],
+  nslookup: (host) => [
+    { t: 'muted', v: `Server:  dns.google` },
+    { t: 'muted', v: `Address:  8.8.8.8` },
+    { t: 'muted', v: `` },
+    { t: 'normal', v: `Non-authoritative answer:` },
+    { t: 'blue', v: `Name:    ${host}` },
+    { t: 'green', v: `Addresses:  142.250.80.46` },
+    { t: 'green', v: `          2607:f8b0:4004:c1b::71` },
+  ],
+  netstat: () => [
+    { t: 'muted', v: `Active Connections` },
+    { t: 'muted', v: `` },
+    { t: 'muted', v: `  Proto  Local Address          Foreign Address        State` },
+    { t: 'green', v: `  TCP    192.168.1.105:49832    142.250.80.46:443      ESTABLISHED` },
+    { t: 'green', v: `  TCP    192.168.1.105:49834    104.18.12.135:443      ESTABLISHED` },
+    { t: 'blue',  v: `  TCP    192.168.1.105:49840    52.96.54.178:443       ESTABLISHED` },
+    { t: 'yellow',v: `  TCP    192.168.1.105:3389     10.0.0.22:57412        TIME_WAIT` },
+    { t: 'muted', v: `  TCP    0.0.0.0:135            0.0.0.0:0              LISTENING` },
+    { t: 'muted', v: `  TCP    0.0.0.0:445            0.0.0.0:0              LISTENING` },
+  ],
+  sfc: () => [
+    { t: 'normal', v: `Beginning system scan. This process will take some time.` },
+    { t: 'muted', v: `` },
+    { t: 'blue', v: `Beginning verification phase of system scan.` },
+    { t: 'blue', v: `Verification 100% complete.` },
+    { t: 'muted', v: `` },
+    { t: 'green', v: `Windows Resource Protection did not find any integrity violations.` },
+  ],
+};
+
+function runDiag() {
+  const cmd = document.getElementById('diagCmd').value;
+  const host = document.getElementById('diagHost').value || 'google.com';
+  const out = document.getElementById('termOutput');
+  const lines = diagOutputs[cmd] ? diagOutputs[cmd](host) : [];
+  const prefix = document.getElementById('diagCmd').options[document.getElementById('diagCmd').selectedIndex].text.split('—')[0].trim();
+
+  let html = `<div><span class="line-green">C:\\Users\\HelpDesk&gt;</span> <span class="line-blue">${prefix} ${['ipconfig','sfc','netstat'].includes(cmd) ? '' : host}</span></div>`;
+  html += '<div>&nbsp;</div>';
+
+  lines.forEach(l => {
+    const cls = l.t === 'green' ? 'line-green' : l.t === 'blue' ? 'line-blue' : l.t === 'red' ? 'line-red' : l.t === 'yellow' ? 'line-yellow' : l.t === 'muted' ? 'line-muted' : '';
+    html += `<div class="${cls}">${l.v || '&nbsp;'}</div>`;
+  });
+
+  html += '<div>&nbsp;</div>';
+  html += `<div><span class="line-green">C:\\Users\\HelpDesk&gt;</span> <span class="line-muted">_</span></div>`;
+  out.innerHTML = html;
+  out.scrollTop = out.scrollHeight;
+}
+
+// ===== TICKETS =====
+let tickets = [];
+let ticketId = 1000;
+
+function addTicket() {
+  const title = document.getElementById('tTitle').value.trim();
+  const cat = document.getElementById('tCat').value;
+  const priority = document.getElementById('tPriority').value;
+  const desc = document.getElementById('tDesc').value.trim();
+
+  if (!title) { alert('Please enter an issue title.'); return; }
+
+  tickets.push({
+    id: 'TKT-' + (++ticketId),
+    title, cat, priority,
+    desc,
+    status: 'open',
+    created: new Date().toLocaleDateString()
+  });
+
+  document.getElementById('tTitle').value = '';
+  document.getElementById('tDesc').value = '';
+  renderTickets();
+}
+
+function cycleStatus(id) {
+  const t = tickets.find(t => t.id === id);
+  if (!t) return;
+  const cycle = ['open', 'in-progress', 'closed'];
+  t.status = cycle[(cycle.indexOf(t.status) + 1) % cycle.length];
+  renderTickets();
+}
+
+function deleteTicket(id) {
+  tickets = tickets.filter(t => t.id !== id);
+  renderTickets();
+}
+
+function renderTickets() {
+  const open = tickets.filter(t => t.status === 'open').length;
+  const prog = tickets.filter(t => t.status === 'in-progress').length;
+  const closed = tickets.filter(t => t.status === 'closed').length;
+  document.getElementById('statOpen').textContent = open;
+  document.getElementById('statProgress').textContent = prog;
+  document.getElementById('statClosed').textContent = closed;
+
+  const wrap = document.getElementById('ticketTableWrap');
+  if (tickets.length === 0) {
+    wrap.innerHTML = '<div class="empty-state"><div class="emoji">📭</div>No tickets yet. Submit one!</div>';
+    return;
+  }
+
+  let html = `<table><thead><tr><th>ID</th><th>Title</th><th>Cat</th><th>Priority</th><th>Status</th><th></th></tr></thead><tbody>`;
+  tickets.forEach(t => {
+    const sBadge = t.status === 'open' ? 'badge-open' : t.status === 'in-progress' ? 'badge-progress' : 'badge-closed';
+    const sLabel = t.status === 'in-progress' ? 'In Progress' : t.status.charAt(0).toUpperCase() + t.status.slice(1);
+    const pBadge = t.priority === 'high' ? 'badge-high' : t.priority === 'low' ? 'badge-low' : 'badge-progress';
+    html += `<tr>
+      <td style="font-family:var(--mono);font-size:0.75rem;color:var(--text-muted)">${t.id}</td>
+      <td style="font-size:0.83rem;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.title}</td>
+      <td style="font-size:0.75rem;color:var(--text-muted)">${t.cat.split('/')[0].trim()}</td>
+      <td><span class="badge ${pBadge}">${t.priority}</span></td>
+      <td><span class="badge ${sBadge}" style="cursor:pointer" onclick="cycleStatus('${t.id}')" title="Click to cycle status">${sLabel}</span></td>
+      <td><button class="btn btn-danger" style="padding:2px 8px;font-size:0.7rem" onclick="deleteTicket('${t.id}')">✕</button></td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+// ===== GUIDES =====
+const guides = [
+  {
+    icon: '🌐', title: 'No Internet Connection',
+    steps: [
+      { n: '1', t: 'Check physical cables or Wi-Fi connection indicator.', cmd: null },
+      { n: '2', t: 'Run', cmd: 'ipconfig /all', s: 'to verify IP address is not 169.254.x.x (APIPA).' },
+      { n: '3', t: 'Ping the default gateway:', cmd: 'ping 192.168.1.1', s: '' },
+      { n: '4', t: 'If gateway is unreachable, restart the router/switch (30-second power cycle).' },
+      { n: '5', t: 'Ping a public DNS server:', cmd: 'ping 8.8.8.8', s: 'to rule out DNS issues.' },
+      { n: '6', t: 'If 8.8.8.8 works but sites don\'t, flush DNS:', cmd: 'ipconfig /flushdns', s: '' },
+      { n: '7', t: 'Release and renew IP:', cmd: 'ipconfig /release && ipconfig /renew', s: '' },
+      { n: '8', t: 'Reset TCP/IP stack:', cmd: 'netsh int ip reset', s: '(requires reboot).' },
+    ]
+  },
+  {
+    icon: '🔑', title: 'User Locked Out / Password Reset',
+    steps: [
+      { n: '1', t: 'Verify identity per company policy (employee ID, manager approval, etc.).' },
+      { n: '2', t: 'In Active Directory Users and Computers, locate the user account.' },
+      { n: '3', t: 'Right-click → Unlock Account to clear the lockout.' },
+      { n: '4', t: 'Check Account Lockout Policy in Group Policy (minimum observation period).' },
+      { n: '5', t: 'Reset password and check "User must change password at next logon".' },
+      { n: '6', t: 'Ask user to log in and verify access to key resources.' },
+      { n: '7', t: 'Document the lockout reason and any patterns (repeated lockouts = investigate).' },
+    ]
+  },
+  {
+    icon: '🖨️', title: 'Printer Not Printing',
+    steps: [
+      { n: '1', t: 'Verify the printer is powered on and paper is loaded.' },
+      { n: '2', t: 'Check for error lights or error messages on the printer LCD.' },
+      { n: '3', t: 'Open', cmd: 'control printers', s: '(Run) and check the print queue — clear stuck jobs.' },
+      { n: '4', t: 'Restart the Print Spooler service:', cmd: 'net stop spooler && net start spooler', s: '' },
+      { n: '5', t: 'Confirm the correct printer is set as Default.' },
+      { n: '6', t: 'Verify network printer IP hasn\'t changed — ping the printer IP.' },
+      { n: '7', t: 'Reinstall driver from manufacturer site if issue persists.' },
+    ]
+  },
+  {
+    icon: '💻', title: 'Computer Running Slowly',
+    steps: [
+      { n: '1', t: 'Open Task Manager (Ctrl+Shift+Esc) → check CPU, Memory, Disk usage.' },
+      { n: '2', t: 'Kill any process consuming excessive resources.' },
+      { n: '3', t: 'Check for Windows Updates or antivirus scans running in background.' },
+      { n: '4', t: 'Run Disk Cleanup:', cmd: 'cleanmgr', s: 'and delete temp files.' },
+      { n: '5', t: 'Disable unnecessary startup programs in Task Manager → Startup tab.' },
+      { n: '6', t: 'Check available disk space — under 10% free causes performance issues.' },
+      { n: '7', t: 'Run SFC to check for corrupt system files:', cmd: 'sfc /scannow', s: '' },
+      { n: '8', t: 'If RAM is maxed out consistently, consider upgrade or memory leak investigation.' },
+    ]
+  },
+  {
+    icon: '📧', title: 'Outlook / Email Not Working',
+    steps: [
+      { n: '1', t: 'Verify internet connection is working (browse a website).' },
+      { n: '2', t: 'Check if issue is Outlook-only or affects webmail (OWA) too.' },
+      { n: '3', t: 'Start Outlook in safe mode:', cmd: 'outlook /safe', s: 'to rule out add-in conflicts.' },
+      { n: '4', t: 'Check the "Outbox" — stuck emails can block sends.' },
+      { n: '5', t: 'Repair the Outlook profile via Control Panel → Mail → Email Accounts.' },
+      { n: '6', t: 'Verify Exchange/SMTP server settings with IT or run Autodiscover test.' },
+      { n: '7', t: 'Rebuild the Outlook profile if all else fails — back up PST first.' },
+    ]
+  },
+  {
+    icon: '🔵', title: 'Blue Screen of Death (BSOD)',
+    steps: [
+      { n: '1', t: 'Note the STOP code on the blue screen (e.g. DRIVER_IRQL_NOT_LESS_OR_EQUAL).' },
+      { n: '2', t: 'Boot into Safe Mode to isolate the issue from drivers.' },
+      { n: '3', t: 'Check Event Viewer → Windows Logs → System for critical errors around the crash time.' },
+      { n: '4', t: 'Run memory diagnostic:', cmd: 'mdsched.exe', s: 'to test RAM.' },
+      { n: '5', t: 'Update or roll back recently installed drivers (especially GPU/NIC).' },
+      { n: '6', t: 'Run SFC and DISM:', cmd: 'DISM /Online /Cleanup-Image /RestoreHealth', s: '' },
+      { n: '7', t: 'Check for hardware issues: reseat RAM sticks, verify drive health with CrystalDiskInfo.' },
+    ]
+  },
+];
+
+function renderGuides() {
+  const container = document.getElementById('guidesContainer');
+  container.innerHTML = guides.map((g, i) => `
+    <div class="guide-item" id="guide-${i}">
+      <div class="guide-header" onclick="toggleGuide(${i})">
+        <span>
+          <div class="guide-icon">${g.icon}</div>
+          ${g.title}
+        </span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="guide-body">
+        ${g.steps.map(s => `
+          <div class="step">
+            <span class="step-num">${s.n}.</span>
+            <span class="step-text">${s.t}${s.cmd ? ` <span class="step-cmd">${s.cmd}</span>` : ''}${s.s ? ` <span class="step-note">${s.s}</span>` : ''}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleGuide(i) {
+  document.getElementById('guide-' + i).classList.toggle('open');
+}
+
+renderGuides();
+</script>
+</body>
+</html>
